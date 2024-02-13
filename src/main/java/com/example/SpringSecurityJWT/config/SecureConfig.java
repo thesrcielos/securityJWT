@@ -3,7 +3,10 @@ package com.example.SpringSecurityJWT.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractAuthenticationFilterConfigurer;
@@ -26,7 +29,8 @@ public class SecureConfig {
                 .anyRequest().authenticated()).
                 formLogin(AbstractAuthenticationFilterConfigurer::permitAll).
                 sessionManagement(session->session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)).
-
+                httpBasic(httpSecurityHttpBasicConfigurer -> httpSecurityHttpBasicConfigurer.init(http)).
+                authenticationProvider(authenticationProvider()).
                 build();
     }
 
@@ -42,8 +46,14 @@ public class SecureConfig {
         return new BCryptPasswordEncoder();
     }
     @Bean
-    AuthenticationManager authenticationManager(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(userDetailsService()).passwordEncoder(passwordEncoder());
-        return auth.build();
+    AuthenticationManager authenticationManager(AuthenticationConfiguration auth) throws Exception {
+        return auth.getAuthenticationManager();
+    }
+    AuthenticationProvider authenticationProvider(){
+        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+        provider.setUserDetailsService(userDetailsService());
+        provider.setPasswordEncoder(passwordEncoder());
+        return provider;
+
     }
 }
