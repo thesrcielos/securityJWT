@@ -29,7 +29,6 @@ public class SecureConfig {
                 .anyRequest().authenticated()).
                 formLogin(AbstractAuthenticationFilterConfigurer::permitAll).
                 sessionManagement(session->session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)).
-                httpBasic(httpSecurityHttpBasicConfigurer -> httpSecurityHttpBasicConfigurer.init(http)).
                 authenticationProvider(authenticationProvider()).
                 build();
     }

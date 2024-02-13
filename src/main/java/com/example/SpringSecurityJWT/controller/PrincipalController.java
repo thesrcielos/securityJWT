@@ -11,14 +11,17 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Set;
 import java.util.stream.Collectors;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @RestController
 @RequestMapping("/api")
 public class PrincipalController {
     private final UserRepository userRepository;
-
-    public PrincipalController(UserRepository userRepository) {
+    private final PasswordEncoder passwordEncoder;
+    
+    public PrincipalController(UserRepository userRepository, PasswordEncoder password) {
         this.userRepository = userRepository;
+        passwordEncoder = password;
     }
 
     @GetMapping("/hello")
@@ -43,7 +46,7 @@ public class PrincipalController {
                 collect(Collectors.toSet());
         UserEntity userEntity = UserEntity.builder().
                 username(createUserDTO.getUsername()).
-                password(createUserDTO.getPassword()).
+                password(passwordEncoder.encode(createUserDTO.getPassword())).
                 email(createUserDTO.getEmail()).
                 roles(roles).
                 build();
